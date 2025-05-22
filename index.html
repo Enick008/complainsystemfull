@@ -70,16 +70,51 @@
         max-height: 80px; /* กำหนดความสูงสูงสุดของโลโก้ */
         width: auto; /* รักษาอัตราส่วน */
     }
+
+    /* สไตล์สำหรับซ่อน Header และ Tab Bar เมื่อเลื่อนลง */
+    .hide-on-scroll {
+      transform: translateY(-100%); /* เลื่อนขึ้นไปด้านบนเพื่อซ่อน */
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    /* สไตล์สำหรับ Header และ Tab Bar เพื่อให้มีการเปลี่ยนผ่านที่ราบรื่น */
+    .header-fixed, .tabs-fixed {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000; /* ให้อยู่ด้านบนสุด */
+      transition: transform 0.3s ease-out, opacity 0.3s ease-out, visibility 0.3s ease-out;
+    }
+
+    /* ปรับ padding-top ของ main เพื่อไม่ให้เนื้อหาถูก header/tabs บัง */
+    main {
+      padding-top: 150px; /* ปรับตามความสูงรวมของ header และ tab bar */
+    }
+
+    /* สำหรับหน้าจอขนาดใหญ่ (desktop), ไม่ต้องซ่อน header/tabs */
+    @media (min-width: 768px) { /* md breakpoint in Tailwind CSS */
+      .header-fixed, .tabs-fixed {
+        position: relative; /* กลับไปเป็น relative */
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+      }
+      main {
+        padding-top: 0; /* ลบ padding-top สำหรับ desktop */
+      }
+    }
   </style>
 </head>
 <body class="flex flex-col min-h-screen">
-  <header class="text-center py-6 bg-white shadow-lg border-b border-red-200">
+  <header id="main-header" class="header-fixed text-center py-6 bg-white shadow-lg border-b border-red-200">
     <img src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Seal_of_Ko_Samui.png" alt="Seal of Ko Samui" class="header-logo mx-auto">
     <h1 class="text-3xl font-bold text-red-700 mt-2">ระบบจัดการเรื่องร้องเรียน</h1>
     <p class="text-gray-600 text-sm">กองช่างสุขาภิบาล</p>
   </header>
 
-  <div class="flex justify-center mt-8 px-4">
+  <div id="tab-bar" class="tabs-fixed mt-8 px-4">
     <div class="flex flex-wrap justify-center gap-2 rounded-full p-1 bg-white shadow-inner">
       <button class="tab-button tab-button-active" onclick="showTab('tab1', this)">
         <span class="mr-2">📋</span> รับแจ้ง/รายงานผล
@@ -90,7 +125,8 @@
     </div>
   </div>
 
-  <main class="flex-grow mt-6"> <div id="tab1" class="tab-content active rounded-xl overflow-hidden shadow-xl border border-gray-200">
+  <main class="flex-grow mt-6">
+    <div id="tab1" class="tab-content active rounded-xl overflow-hidden shadow-xl border border-gray-200">
       <iframe src="https://complaintsystems.netlify.app/"></iframe>
     </div>
     <div id="tab2" class="tab-content rounded-xl overflow-hidden shadow-xl border border-gray-200">
@@ -138,6 +174,32 @@
       if (initialButton) {
         showTab('tab1', initialButton);
       }
+    });
+
+    // JavaScript สำหรับซ่อน/แสดง Header และ Tab Bar เมื่อเลื่อนหน้าจอ
+    let lastScrollY = window.scrollY;
+    const header = document.getElementById('main-header');
+    const tabBar = document.getElementById('tab-bar');
+    const headerHeight = header.offsetHeight; // ความสูงของ Header
+    const tabBarHeight = tabBar.offsetHeight; // ความสูงของ Tab Bar
+
+    // ปรับตำแหน่งของ Tab Bar ให้ติดกับ Header
+    tabBar.style.top = `${headerHeight}px`;
+
+    window.addEventListener('scroll', () => {
+      // ตรวจสอบขนาดหน้าจอ (เฉพาะมือถือ/แท็บเล็ต)
+      if (window.innerWidth < 768) { // Tailwind's 'md' breakpoint
+        if (window.scrollY > lastScrollY && window.scrollY > (headerHeight + tabBarHeight)) {
+          // เลื่อนลง: ซ่อน Header และ Tab Bar
+          header.classList.add('hide-on-scroll');
+          tabBar.classList.add('hide-on-scroll');
+        } else {
+          // เลื่อนขึ้น หรืออยู่ที่ด้านบนสุด: แสดง Header และ Tab Bar
+          header.classList.remove('hide-on-scroll');
+          tabBar.classList.remove('hide-on-scroll');
+        }
+      }
+      lastScrollY = window.scrollY;
     });
   </script>
 </body>
