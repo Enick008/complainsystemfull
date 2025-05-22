@@ -48,7 +48,7 @@
       opacity: 0;
       transform: translateY(10px); /* เริ่มต้นอยู่ต่ำกว่าเล็กน้อย */
       transition: opacity 0.4s ease-out, transform 0.4s ease-out;
-      height: 100%; /* ให้ tab-content ขยายเต็มความสูงของ main */
+      /* Removed height: 100%; as iframe will manage its own height */
     }
 
     /* สไตล์เมื่อเนื้อหาแท็บทำงานอยู่ */
@@ -58,10 +58,10 @@
       transform: translateY(0); /* เลื่อนขึ้นมาตำแหน่งปกติ */
     }
 
-    /* สไตล์สำหรับ iframe เพื่อให้พอดีกับ container */
+    /* สไตล์สำหรับ iframe เพื่อให้พอดีกับ container และเต็มจอ */
     iframe {
       width: 100%;
-      height: 100%; /* ให้ iframe ขยายเต็มความสูงของ tab-content */
+      height: calc(100vh - 280px); /* คำนวณความสูงให้เต็มจอ โดยหักส่วน Header, Tab Bar, Footer */
       border: none;
       border-radius: 0.75rem; /* rounded-xl */
     }
@@ -76,10 +76,11 @@
 <body class="flex flex-col min-h-screen">
   <header class="text-center py-3 bg-white shadow-lg border-b border-red-200">
     <img src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Seal_of_Ko_Samui.png" alt="Seal of Ko Samui" class="header-logo mx-auto">
-    <h1 class="text-3xl font-bold text-red-700">ระบบจัดการเรื่องร้องเรียน</h1> <p class="text-gray-600 text-sm">กองช่างสุขาภิบาล</p>
+    <h1 class="text-3xl font-bold text-red-700 mt-2">ระบบจัดการเรื่องร้องเรียน</h1> <p class="text-gray-600 text-sm">กองช่างสุขาภิบาล</p>
   </header>
 
-  <div class="px-4 py-2 bg-white shadow-md"> <div class="flex flex-wrap justify-center gap-2 rounded-full p-1 bg-white shadow-inner">
+  <div class="px-4 py-2 bg-white shadow-md">
+    <div class="flex flex-wrap justify-center gap-2 rounded-full p-1 bg-white shadow-inner">
       <button class="tab-button tab-button-active" onclick="showTab('tab1', this)">
         <span class="mr-2">📋</span> รับแจ้ง/รายงานผล
       </button>
@@ -89,7 +90,8 @@
     </div>
   </div>
 
-  <main class="flex-grow"> <div id="tab1" class="tab-content active rounded-xl overflow-hidden shadow-xl border border-gray-200">
+  <main class="flex-grow">
+    <div id="tab1" class="tab-content active rounded-xl overflow-hidden shadow-xl border border-gray-200">
       <iframe src="https://complaintsystems.netlify.app/"></iframe>
     </div>
     <div id="tab2" class="tab-content rounded-xl overflow-hidden shadow-xl border border-gray-200">
